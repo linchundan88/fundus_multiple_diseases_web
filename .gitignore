@@ -1,8 +1,5 @@
-/.idea/*
 .idea/
 *.sqlite
 __pycache__/
 my_module/__pycache__/
-*.hdf5
-*.h5
-*.csv
+
