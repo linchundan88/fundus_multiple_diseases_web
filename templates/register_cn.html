@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+
+</head>
+<body>
+    <p style="color: #ff0000"> {{ error_msg }}</p>
+
+
+    请填写以下表格(所有的字段都必须填写)，人工审核通过后，会将登录密码通过发邮件给您。
+     <p></p>
+    <form action="/do_register" method="post"> {% csrf_token %}
+        电子邮件（同时作为登录账号）:<input type="text" name="email"/> <br>
+        姓名:<input type="text" name="name"> <br>
+        电话号码:<input type="text" name="tel"> <br>
+        单位或者组织:<input type="text" name="company"> <br>
+        职位:<input type="text" name="title"> <br>
+        <input type="hidden" name="lang" value="cn" />
+        <input type="submit" value="提交">
+
+</body>
+</html>

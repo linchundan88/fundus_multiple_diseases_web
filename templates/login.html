@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font2{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+    <title>Login</title>
+</head>
+<body>
+
+    <h3 class="font0">Welcome to Fundus Images Automatic Diagnosis System. Please login.</h3>
+    <p></p>
+
+    <p></p>
+    <form action="login1" method="post">{% csrf_token %}
+        username:<input type="text" name="username"/> <br>
+        password:<input type="password" name="password"> <br>
+        <input type="hidden" name="lang" value="en" />
+        <input type="submit" value="submit">
+        &nbsp;&nbsp;
+        <a href="/register?lang=en">register</a>
+    </form>
+    <h3 class="font1">
+        {% if err_msg != None %}
+            {{ err_msg }}
+        {% endif %}
+
+    </h3>
+
+
+</body>
+</html>

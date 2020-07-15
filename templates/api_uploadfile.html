@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>API test upload file</title>
+
+
+</head>
+<body>
+    {% load staticfiles %}
+    <p></p>
+
+    <form method="post" action="api_uploadfile_service" enctype="multipart/form-data" >
+{#        {% csrf_token %}#}
+
+        <input type="file"  name="input_image_file" /><br /><br />
+        <p></p>
+        username:<input type="text" name="username" value="test"/> <br>
+        password:<input type="text" name="password" value="jsiec"> <br>
+
+        <p><input type="submit" value="upload"/></p>
+    </form>
+
+</body>
+</html>

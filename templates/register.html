@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+
+</head>
+<body>
+    <p style="color: #ff0000"> {{ error_msg }}</p>
+
+    Please fill in the following form, after the manual verivication, you will receive your password through email.
+
+    <p></p>
+    <form action="/do_register" method="post" >{% csrf_token %}
+        Email(used as login account)(*):<input type="text" name="email"/> <br>
+        Name(*):<input type="text" name="name"> <br>
+        Telephone(*):<input type="text" name="tel"> <br>
+        Your company or organization(*):<input type="text" name="company"> <br>
+        Your Title(*):<input type="text" name="title"> <br>
+        <input type="hidden" name="lang" value="en" />
+        <input type="submit" value="submit">
+
+
+    </form>
+</body>
+</html>

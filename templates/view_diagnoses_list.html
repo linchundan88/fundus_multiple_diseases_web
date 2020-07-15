@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+        <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font2{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+    <title>view historical diagnostic results</title>
+</head>
+<body>
+    <p></p>
+    &nbsp;&nbsp;&nbsp;
+    <a href="/uploadimage">Diagnose fundus images</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/logout">logout</a>
+    <p></p>
+
+    <table border="1">
+        <td></td>
+        <td>diagnostic result</td>
+        <td>feedback score</td>
+        <td>Date time</td>
+        {% for result1 in result_list %}
+            <tr>
+            {# image_uuid,diagnostic_results,feedback_score,feedback_memo,date_time  #}
+                <td><a href="/view_diagnoses_single?uuid={{result1.0}}">View Details</a></td>
+                <td>{{result1.1}}</td>
+                <td>
+                    {% if result1.2 == 5 %}
+                         absolutely correct
+                    {% elif result1.2 == 3 %}
+                        Partial correct
+                    {% elif result1.2 == 0 %}
+                        absolutely wrong
+                    {% endif %}
+                </td>
+                <td>{{result1.4}}</td>
+            </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font2{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+    <title>用户登录</title>
+</head>
+<body>
+    <h3 class="font0">欢迎使用眼底图像自动分析系统，请登录。</h3>
+    <p></p>
+
+    <p></p>
+    <form action="login1" method="post">{% csrf_token %}
+        用户帐号:<input type="text" name="username"/> <br>
+        用户密码:<input type="password" name="password"> <br>
+        <input type="hidden" name="lang" value="cn" />
+        <input type="submit" value="提交">
+        &nbsp;&nbsp;
+        <a href="/register?lang=cn">用户注册</a>
+    </form>
+    <h3 class="font1">
+        {% if err_msg != None %}
+            {{ err_msg }}
+        {% endif %}
+
+    </h3>
+
+
+</body>
+</html>

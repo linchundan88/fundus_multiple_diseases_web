@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis results</title>
+    <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+
+    {% load static %}
+    <script type='text/javascript' src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript">
+
+        {#$(document).ready( function(){#}
+        {##}
+        {#    if ({{ predict_result.show_cam }}  == 1 )#}
+        {#    {#}
+        {#        str_uuid = '{{ predict_result.str_uuid }}'#}
+        {##}
+        {#        $.get("saliency?type=CAM&str_uuid="+str_uuid, function(data){#}
+        {#            if (data.filename_CAM0 != null)#}
+        {#            {#}
+        {#                $("#image_CAM0").attr("src", data.filename_CAM0);#}
+        {#                $("#image_CAM0").css("width", 299);#}
+        {#                $("#image_CAM0").css("height", 299);#}
+        {#            }#}
+        {##}
+        {#            if (data.filename_CAM1 != null)#}
+        {#            {#}
+        {#                $("#image_CAM1").attr("src", data.filename_CAM1);#}
+        {#                $("#image_CAM1").css("width", 299);#}
+        {#                $("#image_CAM1").css("height", 299);#}
+        {#            }#}
+        {##}
+        {#            if (data.filename_CAM2 != null)#}
+        {#            {#}
+        {#                $("#image_CAM2").attr("src", data.filename_CAM2);#}
+        {#                $("#image_CAM2").css("width", 299);#}
+        {#                $("#image_CAM2").css("height", 299);#}
+        {#            }#}
+        {#        });#}
+        {##}
+        {#    }#}
+        {#});#}
+        {##}
+        {#$(document).ready( function(){#}
+        {##}
+        {#    if ({{ predict_result.show_deeplift }}  == 1 )#}
+        {#    {#}
+        {#        str_uuid = '{{ predict_result.str_uuid }}'#}
+        {##}
+        {#        $.get("saliency?type=deeplift&str_uuid="+str_uuid, function(data){#}
+        {#            if (data.filename_deeplift0 != null)#}
+        {#            {#}
+        {#                $("#image_deeplift0").attr("src", data.filename_deeplift0);#}
+        {#                $("#image_deeplift0").css("width", 299);#}
+        {#                $("#image_deeplift0").css("height", 299);#}
+        {#            }#}
+        {##}
+        {#            if (data.filename_deeplift1 != null)#}
+        {#            {#}
+        {#                $("#image_deeplift1").attr("src", data.filename_deeplift1);#}
+        {#                $("#image_deeplift1").css("width", 299);#}
+        {#                $("#image_deeplift1").css("height", 299);#}
+        {#            }#}
+        {##}
+        {#            if (data.filename_deeplift2 != null)#}
+        {#            {#}
+        {#                $("#image_deeplift2").attr("src", data.filename_deeplift2);#}
+        {#                $("#image_deeplift2").css("width", 299);#}
+        {#                $("#image_deeplift2").css("height", 299);#}
+        {#            }#}
+        {#        });#}
+        {#    }#}
+        {##}
+        {#});#}
+        {##}
+        {##}
+        function submitBtnClick(){
+            var formElement = document.forms[0];
+            formElement.submit();
+
+    }
+
+    </script>
+</head>
+<body>
+
+{% load staticfiles %}
+    <p></p>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/uploadimage">Analyse fundus images</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/view_diagnoses">Historical analysis results </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/logout">logout</a>
+
+
+    <p></p>
+    <h3 class="font0">Analysis results from AI</h3>
+
+    {% if 'ocular_surface' in predict_result %}
+        {% if  predict_result.ocular_surface == 0 %}
+            <span style="color: #302fff"> This is a fundus image. </span>
+        {% elif predict_result.ocular_surface == 1 %}
+            <span style="color: #FF0000;font-size:large">This image probably is an ocular surface image! </span>
+        {% elif predict_result.ocular_surface == 2 %}
+            <span style="color: #FF0000;font-size:large">This image probably is not a fundus image! </span>
+        {% endif %}
+
+        {% comment %}
+        Probabilities:
+        {{ predict_result.ocular_surface_0_name }} :
+        {{ predict_result.ocular_surface_0_prob }} %,
+        {{ predict_result.ocular_surface_1_name }} :
+        {{ predict_result.ocular_surface_1_prob }} %,
+        {{ predict_result.ocular_surface_2_name }} :
+        {{ predict_result.ocular_surface_2_prob }} %
+        {% endcomment %}
+        <br>
+    {% endif %}
+
+    {% if 'img_gradable' in predict_result %}
+        {% if  predict_result.img_gradable == 0 %}
+            <span style="color: #302fff">Image quality: gradable. </span>
+        {% elif predict_result.img_gradable == 1 %}
+            <span style="color: #FF0000;font-size:large">Image quality: ungradable. </span>
+        {% endif %}
+
+        {% comment %}
+        Probabilities:
+        gradable :
+        {{ predict_result.img_gradable_0_prob }} %,
+        ungradable :
+        {{ predict_result.img_gradable_1_prob }} %
+        {% endcomment %}
+         <br>
+    {% endif %}
+
+    {% if 'left_right_eye' in predict_result %}
+        {% if predict_result.left_right_eye == 0 %}
+            <span style="color: #302fff"> Left eye. </span>
+        {% elif predict_result.left_right_eye == 1 %}
+            <span style="color: #302fff;font-size:large"> Right eye. </span>
+        {% endif %}
+
+        {% comment %}
+        Probabilities:
+        left eye :
+        {{ predict_result.left_right_eye_0_prob }} %,
+        right eye :
+        {{ predict_result.left_right_eye_1_prob }} %
+        {% endcomment %}
+        <br>
+    {% endif %}
+
+    {% if 'img_position' in predict_result %}
+        {% if  predict_result.img_position == 0 %}
+            <span style="color: #302fff">Camera shooting direction：Macular. </span>
+        {% elif predict_result.img_position == 1 %}
+            <span style="color: #302fff;font-size:large">Camera shooting direction：Optic Disc. </span>
+        {% elif predict_result.img_position == 2 %}
+            <span style="color: #302fff;font-size:large">Camera shooting direction：Other. </span>
+
+        {% endif %}
+        <br>
+    {% endif %}
+
+    <p></p>
+    <h3 class="font1"  >Analysis result: {{ predict_result.disease_name }}</h3>
+    <p></p>
+
+    {# Main part- bigclass and subclass probabilities #}
+    <table border="1" style="width:800px ;">
+        <tr>
+            <td style="width:300px">Category and probability</td>
+
+{#            {% if predict_result.show_cam  %}#}
+{#                <td style="width:300px">Class Activation Maps</td>#}
+{#            {% endif %}#}
+{##}
+{#            {% if predict_result.show_deeplift %}#}
+{#                <td style="width:300px">DeepLift</td>#}
+{#            {% endif %}#}
+{##}
+{#            {% if predict_result.show_deepshap %}#}
+{#                <td style="width:300px">Deep Shap</td>#}
+{#            {% endif %}#}
+
+            <td style="width: 300px">Subcategory and probability</td>
+        </tr>
+
+        {% if predict_result.bigclass_0_prob > 0 %}
+        <tr>
+            <td>
+                {{ predict_result.bigclass_0_name }}
+                &nbsp;: &nbsp;
+                <font color="red">
+                {{ predict_result.bigclass_0_prob }} %
+                </font>
+            </td>
+
+{#            {% if predict_result.show_cam %}#}
+{#                <td>#}
+{#                    <img id="image_CAM0" src={{ predict_result.bigclass_0_CAM }} height="299" width="299" alt="">#}
+{#                </td>#}
+{#            {% endif %}#}
+{##}
+{#            {% if predict_result.show_deeplift %}#}
+{#                <td>#}
+{#                    <img id="image_deeplift0" src={{ predict_result.bigclass_0_CAM_deeplift }} height="299" width="299"  alt="">#}
+{#                </td>#}
+{#            {% endif %}#}
+{##}
+{#            {% if predict_result.show_deepshap %}#}
+{#                <td>#}
+{#                    <img id="image_deepshap0" src={{ predict_result.bigclass_0_CAM_deepshap }} height="299" width="299"  alt="">#}
+{#                </td>#}
+{#            {% endif %}#}
+
+            {# Subclasses #}
+            <td>
+                {% if predict_result.bigclass_0_no == 0  %}
+                    Detection of
+                    {{ predict_result.subclass_0_1_2_name }} :
+
+                    {% if predict_result.subclass_0_1_2_prob > 50.0 %}
+                        <font  color="red">
+                        {{ predict_result.subclass_0_1_2_prob }} %
+                        </font>
+                    {% else %}
+                        <font>
+                        {{ predict_result.subclass_0_1_2_prob }} %
+                        </font>
+                    {% endif %}
+                    <br>
+
+                    Detection of
+                    {{ predict_result.subclass_0_2_2_name }} :
+
+                    {% if predict_result.subclass_0_2_2_prob > 50.0 %}
+                        <font  color="red">
+                        {{ predict_result.subclass_0_2_2_prob }} %
+                        </font>
+                    {% else %}
+                        <font>
+                        {{ predict_result.subclass_0_2_2_prob }} %
+                        </font>
+                    {% endif %}
+                    <br>
+
+                    Detection of
+                    {{ predict_result.subclass_0_3_2_name }} :
+
+                    {% if predict_result.subclass_0_3_2_prob > 50.0 %}
+                        <font  color="red">
+                        {{ predict_result.subclass_0_3_2_prob }} %
+                        </font>
+                    {% else %}
+                        <font>
+                        {{ predict_result.subclass_0_3_2_prob }} %
+                        </font>
+                    {% endif %}
+
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no == 1  %}
+                    {{ predict_result.subclass_1_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_1_1_prob }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_1_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_1_2_prob }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 2  %}
+                    {{ predict_result.subclass_2_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_2_1_prob }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_2_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_2_2_prob }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 5  %}
+                    {{ predict_result.subclass_5_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_5_1_prob }}
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_5_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_5_2_prob }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 15  %}
+                    {{ predict_result.subclass_15_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_15_1_prob }} %
+                    </font>
+                    <br>
+                    <font>
+                    {{ predict_result.subclass_15_2_name }}:
+                    {{ predict_result.subclass_15_2_prob }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 29  %}
+                    {{ predict_result.subclass_29_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_29_1_prob }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_29_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_29_2_prob }} %
+                    </font>
+                {% endif %}
+
+                {% if  predict_result.bigclass_0_no  == 10 %}
+                    {{ predict_result.subclass_10_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_10_1_prob }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_10_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_10_2_prob }} %
+                    </font>
+
+{#                    <br>#}
+{#                    Cropped optic disc:#}
+{#                    <br>#}
+{#                    {% if 'img_file_crop_optic_disc' in predict_result %}#}
+{#                        {% if  predict_result.img_file_crop_optic_disc != '' %}#}
+{#                            <img src={{ predict_result.img_file_crop_optic_disc }} alt="">#}
+{#                        {% endif %}#}
+{#                    {% endif %}#}
+{#                    <br>#}
+{#                    {% if 'img_file_crop_optic_disc_mask' in predict_result  %}#}
+{#                        {% if  predict_result.img_file_crop_optic_disc_mask != '' %}#}
+{#                            <br/>#}
+{#                            <img src={{ predict_result.img_file_crop_optic_disc_mask }} alt="">#}
+{#                        {% endif %}#}
+{#                    {% endif %}#}
+
+                {% endif %}       
+
+            </td>
+
+        </tr>
+        {% endif %}
+
+        {% if predict_result.bigclass_1_prob > 0 %}
+        <tr>
+            <td>
+                {{ predict_result.bigclass_1_name }}
+                &nbsp;: &nbsp;
+                <font >
+                {{ predict_result.bigclass_1_prob }} %
+                </font>
+            </td>
+
+{#            {% if predict_result.show_cam == 1 %}#}
+{#                <td>#}
+{#                    <img id="image_CAM1" src=""  alt="">#}
+{#                </td>#}
+{#            {% endif %}#}
+{##}
+{#            {% if predict_result.show_deeplift == 1 %}#}
+{#                <td>#}
+{#                    <img id="image_deeplift1" src=""  alt="">#}
+{#                </td>#}
+{#            {% endif %}#}
+
+            {# Subclasses Null #}
+            <td>&nbsp;
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if predict_result.bigclass_2_prob > 0 %}
+        <tr>
+            <td>
+                {{ predict_result.bigclass_2_name }}
+                &nbsp;: &nbsp;
+                <font >
+                {{ predict_result.bigclass_2_prob }} %
+                </font>
+            </td>
+
+{#            {% if predict_result.show_cam == 1 %}#}
+{#                <td>#}
+{#                    <img id="image_CAM2" src=""  alt="">#}
+{#                </td>#}
+{#            {% endif %}#}
+{##}
+{#            {% if predict_result.show_deeplift == 1 %}#}
+{#                <td>#}
+{#                    <img id="image_deeplift2" src=""  alt="">#}
+{#                </td>#}
+{#            {% endif %}#}
+
+            <td>&nbsp;
+            </td>
+        </tr>
+        {% endif %}
+
+    </table>
+    <p></p>
+
+    {#original image, preprocessed image, crop optic disc, CAM ... #}
+    <table border="1">
+        <tr>
+            <td class="font3">Original Image</td>
+            <td class="font3">Preprocessed Image</td>
+            {% if  'bigclass_0_CAM' in predict_result %}
+            <td width="300" class="font3">Class Activation Maps for {{ predict_result.bigclass_0_name }}</td>
+            {% endif %}
+            {% if  'img_file_crop_optic_disc' in predict_result %}
+            <td width="120" class="font3">Cropped Optic Disc</td>
+            {% endif %}
+            {% if 'bigclass_0_CAM_deeplift' in predict_result %}
+            <td class="font3">DeepLift for {{ predict_result.bigclass_0_name }}</td>
+            {% endif %}
+            {% if 'bigclass_0_CAM_deepshap' in predict_result %}
+            <td class="font3">DeepShap for {{ predict_result.bigclass_0_name }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="font3">
+                <img src={{ predict_result.img_file_resized_384 }}  height="299" width="299" alt="">
+            </td>
+            <td>
+                <img src={{ predict_result.img_file_preprocessed_384 }}  height="299" width="299" alt="">
+            </td>
+            {% if 'bigclass_0_CAM' in predict_result %}
+            <td>
+                <img src={{ predict_result.bigclass_0_CAM }}  height="299" width="299" alt="">
+            </td>
+            {% endif %}
+            {% if 'img_file_crop_optic_disc' in predict_result %}
+                <td>
+                <img src={{ predict_result.img_file_crop_optic_disc }}  alt="">
+                <p></p>
+                <img src={{ predict_result.img_file_crop_optic_disc_mask }}  alt="">
+                </td>
+            {% endif %}
+            {% if 'bigclass_0_CAM_deeplift' in predict_result %}
+            <td>
+                <img src={{ predict_result.bigclass_0_CAM_deeplift }}  height="299" width="299" alt="">
+            </td>
+            {% endif %}
+            {% if 'bigclass_0_CAM_deepshap' in predict_result %}
+            <td>
+                <img src={{ predict_result.bigclass_0_CAM_deepshap }}  height="299" width="299" alt="">
+            </td>
+            {% endif %}
+        </tr>
+    </table>
+
+    <p> </p>
+    {% if 'img_file_all_lesions' in predict_result %}
+        <span class="font0">Color red stand for Hemorrhages, white stand for HardExudates, and offwhite stand for Cotton wool spots</span>
+        <br>
+
+        <table border="1">
+            <tr>
+                <td class="font0">
+                    original image
+                </td>
+                <td class="font0">
+                    image with lesion areas
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="{{ predict_result.img_file_preprocess1_384 }}" alt="">
+                </td>
+                <td>
+                    <img src="{{ predict_result.img_file_all_lesions }}" alt="">
+                </td>
+            </tr>
+        </table>
+    {% endif %}
+
+    <p> </p>
+
+
+    {%  if realtime_diagnose %}
+    <form action="/feedback">
+         <!--<p class="font3">User feedback</p>-->
+
+        <p class="font3">
+        Please rate the accuracy of the analysis  results:
+
+{#        <p>Partly correct means this image with multiple diseases and AI only found out a part of these.#}
+{#        Probably wrong means you doubt the diagnostic results, but you are not sure about it.#}
+{#        </p>#}
+
+
+        <select name="score">
+          <option value="5">totally correct</option>
+          <option value="4">partly correct</option>
+          <option value="3">probably wrong</option>
+          <option value="0">absolutely wrong</option>
+        </select>
+        </p>
+
+{#        <br>#}
+        Your feedback(such as the correct result that you believe, possible cause of error, etc.)
+        <br>
+        <textarea name="memo" rows="6" cols="60"></textarea>
+        <p></p>
+{#        <input type="submit" value="submit" />#}
+
+
+    </form>
+
+    <p></p>
+
+    <button onclick="submitBtnClick()">Submit</button>
+    &nbsp;&nbsp;&nbsp;
+    <button onclick="javascript:window.location.href='/uploadimage'">Return</button>
+    {% else %}
+        <button onclick="javascript:window.location.href='/view_diagnoses'">Return</button>
+    {% endif %}
+</body>
+</html>

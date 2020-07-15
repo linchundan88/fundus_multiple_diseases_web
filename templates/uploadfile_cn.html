@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎使用彩色眼底图像人工智能自动分析系统</title>
+    <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font2{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+
+</head>
+<body>
+    {% load staticfiles %}
+    <p></p>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/view_diagnoses">查看历史分析记录 </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/logout">注销</a>
+    <p></p>
+
+    <p></p>
+    <h3 class="font0">欢迎使用眼底图像人工智能辅助分析系统。请先点击浏览本地眼底图像文件后(眼底图像分辨率大于400*400像素)，然后点击按钮'上传并自动分析'，AI医生会给出辅助分析结果。本系统的分析结果仅供科学研究和参考。
+    </h3>
+
+    <form method="post" action="diagnose" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="file" name="input_fundus_image" /><br /><br />
+        <p></p>
+        <div style="display:block;">
+            以下是几种不同的解释预测结果的热力图：<br>
+            <span style="display:none">
+                <input type="checkbox" name="show_cam" value="1" checked="checked" >Class Activation Maps
+            </span>
+
+            &nbsp;&nbsp;&nbsp; 请选择热力图的类型:
+            <select name="cam_type">
+                <option value="-1">None</option>
+                <option value="0">原来的CAM</option>
+                <option value="1" selected="selected">修改的CAM</option>
+                <option value="2">Grad CAM++</option>
+            </select>
+
+            <p></p>
+
+            <input type="checkbox" name="show_deepshap" value="1" checked="True" >Deep Shap
+
+        </div>
+
+        <p><input type="submit" value="上传并自动分析"/></p>
+    </form>
+
+    <p></p>
+    <a href="https://www.kaggle.com/linchundan/fundusimage1000/">下载典型的眼底图片以测试本平台</a>
+
+</body>
+</html>

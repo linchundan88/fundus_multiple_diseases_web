@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+        <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font2{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+    <title>查看历史分析结果</title>
+</head>
+<body>
+
+    <p></p>
+    &nbsp;&nbsp;&nbsp;
+    <a href="/uploadimage">分析眼底图像 </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/logout">注销</a>
+    <p></p>
+
+    <table border="1">
+        <td></td>
+        <td>分析结果</td>
+        <td>评价</td>
+        <td>日期时间</td>
+        {% for result1 in result_list %}
+            <tr>
+            {# image_uuid,diagnostic_results,feedback_score,feedback_memo,date_time  #}
+                <td><a href="/view_diagnoses_single?uuid={{result1.0}}">查看详细</a></td>
+                <td>{{result1.1}}</td>
+                <td>
+                    {% if result1.2 == 5 %}
+                         完全正确
+                    {% elif result1.2 == 3 %}
+                        部分正确
+                    {% elif result1.2 == 0 %}
+                        完全错误
+                    {% endif %}
+                </td>
+                <td>{{result1.4}}</td>
+            </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+</html>

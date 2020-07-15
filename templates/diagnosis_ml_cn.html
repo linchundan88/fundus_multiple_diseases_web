@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>分析结果</title>
+    <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+
+    {% load static %}
+    <script type='text/javascript' src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript">
+
+        function submitBtnClick(){
+            var formElement = document.forms[0];
+            formElement.submit();
+
+    }
+
+    </script>
+</head>
+<body>
+
+{% load staticfiles %}
+    <p></p>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/uploadimage">分析眼底图像</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/view_diagnoses">历史分析结果 </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/logout">注销</a>
+
+
+    <p></p>
+    <h3 class="font0">AI分析结果</h3>
+
+    {% if 'ocular_surface' in predict_result %}
+        {% if  predict_result.ocular_surface == 0 %}
+            <span style="color: #302fff"> 这是一张眼底图像. </span>
+        {% elif predict_result.ocular_surface == 1 %}
+            <span style="color: #FF0000;font-size:large">这张图像很可能是眼表图像！ </span>
+        {% elif predict_result.ocular_surface == 2 %}
+            <span style="color: #FF0000;font-size:large">这张图像很可能不是视网膜图像！ </span>
+        {% endif %}
+
+        {% comment %}
+        Probabilities:
+        {{ predict_result.ocular_surface_0_name }} :
+        {{ predict_result.ocular_surface_0_prob }} %,
+        {{ predict_result.ocular_surface_1_name }} :
+        {{ predict_result.ocular_surface_1_prob }} %,
+        {{ predict_result.ocular_surface_2_name }} :
+        {{ predict_result.ocular_surface_2_prob }} %
+        {% endcomment %}
+        <br>
+    {% endif %}
+
+    {% if 'img_gradable' in predict_result %}
+        {% if  predict_result.img_gradable == 0 %}
+            <span style="color: #302fff">图像质量：可以评级. </span>
+        {% elif predict_result.img_gradable == 1 %}
+            <span style="color: #FF0000;font-size:large">图像质量：不可评级. </span>
+        {% endif %}
+
+        {% comment %}
+        Probabilities:
+        gradable :
+        {{ predict_result.img_gradable_0_prob }} %,
+        ungradable :
+        {{ predict_result.img_gradable_1_prob }} %
+        {% endcomment %}
+         <br>
+    {% endif %}
+
+    {% if 'left_right_eye' in predict_result %}
+        {% if predict_result.left_right_eye == 0 %}
+            <span style="color: #302fff"> 眼别：左眼. </span>
+        {% elif predict_result.left_right_eye == 1 %}
+            <span style="color: #302fff;font-size:large"> 眼别：右眼. </span>
+        {% endif %}
+
+        {% comment %}
+        Probabilities:
+        left eye :
+        {{ predict_result.left_right_eye_0_prob }} %,
+        right eye :
+        {{ predict_result.left_right_eye_1_prob }} %
+        {% endcomment %}
+        <br>
+    {% endif %}
+
+    {% if 'img_position' in predict_result %}
+        {% if  predict_result.img_position == 0 %}
+            <span style="color: #302fff">拍摄角度：以黄斑为中心. </span>
+        {% elif predict_result.img_position == 1 %}
+            <span style="color: #302fff;font-size:large">拍摄角度：以视盘为中心. </span>
+        {% elif predict_result.img_position == 2 %}
+            <span style="color: #302fff;font-size:large">拍摄角度：其他. </span>
+
+        {% endif %}
+        <br>
+    {% endif %}
+
+    <p></p>
+    <h3 class="font1"  >Analysis result: {{ predict_result.disease_name }}</h3>
+    <p></p>
+
+    {#original image, preprocessed image, crop optic disc, CAM ... #}
+    <table border="1">
+        <tr>
+            <td class="font3">原始图像</td>
+            <td class="font3">预处理图像</td>
+            {% if  'img_file_crop_optic_disc' in predict_result %}
+            <td width="120" class="font3">裁剪视盘的图像</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="font3">
+                <img src={{ predict_result.img_file_resized_384 }}  height="299" width="299" alt="">
+            </td>
+            <td>
+                <img src={{ predict_result.img_file_preprocessed_384 }}  height="299" width="299" alt="">
+            </td>
+            {% if 'img_file_crop_optic_disc' in predict_result %}
+                <td>
+                <img src={{ predict_result.img_file_crop_optic_disc }}  alt="">
+                <p></p>
+                <img src={{ predict_result.img_file_crop_optic_disc_mask }}  alt="">
+                </td>
+            {% endif %}
+
+        </tr>
+    </table>
+
+    <p> </p>
+    <p> </p>
+    <p></p>
+
+    {% if 'bigclass_normal' in predict_result %}
+        <table border="1">
+            <tr>
+                <td style="width:300px">类别</td>
+                <td>子类和概率</td>
+            </tr>
+            <tr>
+                <td>无需转诊</td>
+                <td>
+                    Detection of
+                    {{ predict_result.subclass_0_1_2_name }} :
+
+                    {% if predict_result.subclass_0_1_2_prob > 50.0 %}
+                        <font  color="red">
+                        {{ predict_result.subclass_0_1_2_prob |floatformat:1 }} %
+                        </font>
+                    {% else %}
+                        <font>
+                        {{ predict_result.subclass_0_1_2_prob |floatformat:1 }} %
+                        </font>
+                    {% endif %}
+                    <br>
+
+                    Detection of
+                    {{ predict_result.subclass_0_2_2_name }} :
+
+                    {% if predict_result.subclass_0_2_2_prob > 50.0 %}
+                        <font  color="red">
+                        {{ predict_result.subclass_0_2_2_prob |floatformat:1 }} %
+                        </font>
+                    {% else %}
+                        <font>
+                        {{ predict_result.subclass_0_2_2_prob |floatformat:1 }} %
+                        </font>
+                    {% endif %}
+                    <br>
+
+                    Detection of
+                    {{ predict_result.subclass_0_3_2_name }} :
+
+                    {% if predict_result.subclass_0_3_2_prob > 50.0 %}
+                        <font  color="red">
+                        {{ predict_result.subclass_0_3_2_prob |floatformat:1 }} %
+                        </font>
+                    {% else %}
+                        <font>
+                        {{ predict_result.subclass_0_3_2_prob |floatformat:1 }} %
+                        </font>
+                    {% endif %}
+
+                </td>
+            </tr>
+        </table>
+
+        <p></p>
+        <p></p>
+        Additional information:
+    {% endif %}
+
+    <table border="1" style="width:800px ;">
+        <tr>
+            <td style="width:300px">病种大类和概率</td>
+            <td width="300" class="font3">CAM热力图</td>
+            {% if 'show_deepshap' in predict_result %}
+                <td width="300" class="font3">Deepshap 热力图</td>
+            {% endif %}
+            <td style="width: 300px">病种子类和概率</td>
+        </tr>
+        <tr>
+            <td style="width:300px">{{ predict_result.bigclass_0_name }}:{{ predict_result.bigclass_0_prob |floatformat:1 }}%</td>
+            <td width="300" class="font3">
+                {% if 'CAM_index_0' in predict_result %}
+                    <img src={{ predict_result.CAM_index_0 }}  height="299" width="299" alt="">
+                {% endif %}
+            </td>
+            {% if 'show_deepshap' in predict_result %}
+                <td width="300" class="font3">
+                    {% if 'Deepshap_index_0' in predict_result %}
+                        <img src={{ predict_result.Deepshap_index_0 }}  height="299" width="299" alt="">
+                    {% endif %}
+                </td>
+            {% endif %}
+            <td style="width: 300px">
+
+                {% if predict_result.bigclass_0_no == 1 and 1 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_1_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_1_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_1_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_1_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 2  and 2 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_2_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_2_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_2_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_2_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 5 and 5 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_5_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_5_1_prob |floatformat:1 }}
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_5_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_5_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 15 and 15 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_15_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_15_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    <font>
+                    {{ predict_result.subclass_15_2_name }}:
+                    {{ predict_result.subclass_15_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_0_no  == 29  and 29 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_29_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_29_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_29_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_29_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if  predict_result.bigclass_0_no  == 10 and 10 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_10_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_10_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_10_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_10_2_prob |floatformat:1 }} %
+                    </font>
+
+                {% endif %}                
+
+            </td>
+        </tr>
+        <tr>
+            <td style="width:300px">{{ predict_result.bigclass_1_name }}:{{ predict_result.bigclass_1_prob |floatformat:1 }}%</td>
+            <td width="300" class="font3">
+                {% if 'CAM_index_1' in predict_result %}
+                    <img src={{ predict_result.CAM_index_1 }}  height="299" width="299" alt="">
+                {% endif %}
+            </td>
+            {% if 'show_deepshap' in predict_result %}
+                <td width="300" class="font3">
+                    {% if 'Deepshap_index_1' in predict_result %}
+                        <img src={{ predict_result.Deepshap_index_1 }}  height="299" width="299" alt="">
+                    {% endif %}
+                </td>
+            {% endif %}
+            <td style="width: 300px">
+                {% if predict_result.bigclass_1_no == 1 and 1 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_1_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_1_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_1_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_1_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_1_no  == 2  and 2 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_2_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_2_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_2_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_2_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_1_no  == 5 and 5 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_5_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_5_1_prob |floatformat:1 }}
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_5_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_5_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_1_no  == 15 and 15 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_15_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_15_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    <font>
+                    {{ predict_result.subclass_15_2_name }}:
+                    {{ predict_result.subclass_15_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_1_no  == 29  and 29 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_29_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_29_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_29_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_29_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if  predict_result.bigclass_1_no  == 10 and 10 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_10_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_10_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_10_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_10_2_prob |floatformat:1 }} %
+                    </font>
+
+                {% endif %}                
+            </td>
+        </tr>
+        <tr>
+            <td style="width:300px">{{ predict_result.bigclass_2_name }}:{{ predict_result.bigclass_2_prob |floatformat:1 }}%</td>
+            <td width="300" class="font3">
+                {% if 'CAM_index_2' in predict_result %}
+                    <img src={{ predict_result.CAM_index_2 }}  height="299" width="299" alt="">
+                {% endif %}
+            </td>
+            {% if 'show_deepshap' in predict_result %}
+                <td width="300" class="font3">
+                    {% if 'Deepshap_index_2' in predict_result %}
+                        <img src={{ predict_result.Deepshap_index_2 }}  height="299" width="299" alt="">
+                    {% endif %}
+                </td>
+            {% endif %}
+
+            <td style="width: 300px">
+                {% if predict_result.bigclass_2_no == 1 and 1 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_1_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_1_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_1_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_1_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_2_no  == 2  and 2 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_2_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_2_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_2_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_2_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_2_no  == 5 and 5 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_5_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_5_1_prob |floatformat:1 }}
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_5_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_5_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_2_no  == 15 and 15 in predict_result.bigclass_pred_list  %}
+                    {{ predict_result.subclass_15_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_15_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    <font>
+                    {{ predict_result.subclass_15_2_name }}:
+                    {{ predict_result.subclass_15_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if predict_result.bigclass_2_no  == 29  and 29 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_29_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_29_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_29_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_29_2_prob |floatformat:1 }} %
+                    </font>
+                {% endif %}
+
+                {% if  predict_result.bigclass_2_no  == 10 and 10 in predict_result.bigclass_pred_list %}
+                    {{ predict_result.subclass_10_1_name }}:
+                    <font color="red">
+                    {{ predict_result.subclass_10_1_prob |floatformat:1 }} %
+                    </font>
+                    <br>
+                    {{ predict_result.subclass_10_2_name }}:
+                    <font >
+                    {{ predict_result.subclass_10_2_prob |floatformat:1 }} %
+                    </font>
+
+                {% endif %}                
+
+            </td>
+        </tr>
+
+    </table>
+
+    <p> </p>
+    <p> </p>
+    <p> </p>
+
+
+    {%  if realtime_diagnose %}
+    <form action="/feedback">
+         <!--<p class="font3">User feedback</p>-->
+
+        <p class="font3">
+        请对以上分析进行评价:
+
+{#        <p>Partly correct means this image with multiple diseases and AI only found out a part of these.#}
+{#        Probably wrong means you doubt the diagnostic results, but you are not sure about it.#}
+{#        </p>#}
+
+
+        <select name="score">
+          <option value="5">完全正确</option>
+          <option value="4">部分正确</option>
+          <option value="3">可能错误</option>
+          <option value="0">完全错误</option>
+        </select>
+        </p>
+
+{#        <br>#}
+        您的意见（您的分析，可能错误原因等）：
+        <br>
+        <textarea name="memo" rows="6" cols="60"></textarea>
+        <p></p>
+{#        <input type="submit" value="submit" />#}
+
+
+    </form>
+
+    <p></p>
+
+    <button onclick="submitBtnClick()">提交</button>
+    &nbsp;&nbsp;&nbsp;
+    <button onclick="javascript:window.location.href='/uploadimage'">返回</button>
+    {% else %}
+        <button onclick="javascript:window.location.href='/view_diagnoses'">返回</button>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Fundus Images Automatic Analysis  System</title>
+    <style type="text/css">
+        .font0{font-size:larger;color:#0000FF}
+        .font1{font-size:large;color:#FF0000}
+        .font2{font-size:large;color:#FF0000}
+        .font3{font-size:large;color:#0000FF}
+    </style>
+
+</head>
+<body>
+    {% load staticfiles %}
+    <p></p>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/view_diagnoses">View historical analysis results</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/logout">logout</a>
+    <p></p>
+
+    <p></p>
+    <h3 class="font0">Please upload a colored fundus image, and click the button 'Analyse'. Resolution of the fundus image should be greater than 400x400 pixels, and should not contain logo(s) or text(s).
+    </h3>
+
+    <form method="post" action="diagnose" enctype="multipart/form-data" >
+        {% csrf_token %}
+
+        <input type="file"  name="input_fundus_image" /><br /><br />
+        <p></p>
+        <div style="display:block;">
+            <span style="display:none">
+                <input type="checkbox" name="show_cam" value="1" checked="checked" >Class Activation Maps
+            </span>
+                Please choose Class Activation Type (default option: modified CAM, which is better than original CAM in most cases)
+            <select name="cam_type">
+                <option value="-1">None</option>
+                <option value="0">Original CAM</option>
+                <option value="1" selected="selected">Modified CAM</option>
+                <option value="2">Grad CAM++</option>
+            </select>
+            <p></p>
+
+            <input type="checkbox" name="show_deepshap" value="1" checked="True"  >Deep Shap
+        </div>
+
+        <p><input type="submit" value="Analyse"/></p>
+    </form>
+
+    <p></p>
+    <a href="https://www.kaggle.com/linchundan/fundusimage1000/">Download typical fundus images for testing the DLP</a>
+
+</body>
+</html>
