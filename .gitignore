@@ -1,5 +1,5 @@
+/database/dlp.sqlite
 .idea/
-*.sqlite
 __pycache__/
 my_module/__pycache__/
-
+static/imgs/
