@@ -11,6 +11,8 @@ import pickle
 import cv2
 
 #AI分析的类, 数据库连接类
+import my_module.my_dlp_helper_multi_class
+import my_module.my_dlp_helper_multi_labels
 from my_module import my_dlp_helper, db_helper
 import shutil
 import my_config
@@ -137,11 +139,11 @@ def diagnose_service(request):
 
 
     if my_config.SOFTMAX_OR_SIGMOIDS == 'softmax':
-        predict_result = my_dlp_helper.predict_all_multi_class(str_uuid, filename_full_path, baseDir, lang,
-                    cam_type=cam_type, show_deeplift=show_deeplift, show_deepshap=show_deepshap)
+        predict_result = my_module.my_dlp_helper_multi_class.predict_all_multi_class(str_uuid, filename_full_path, baseDir, lang,
+                                                                                     cam_type=cam_type, show_deeplift=show_deeplift, show_deepshap=show_deepshap)
     else:
-        predict_result = my_dlp_helper.predict_all_multi_labels(str_uuid, filename_full_path, baseDir, lang,
-                    cam_type=cam_type, show_deeplift=show_deeplift, show_deepshap=show_deepshap)
+        predict_result = my_module.my_dlp_helper_multi_labels.predict_all_multi_labels(str_uuid, filename_full_path, baseDir, lang,
+                                                                                       cam_type=cam_type, show_deeplift=show_deeplift, show_deepshap=show_deepshap)
 
     #region 保存结果
     # 保存分析结果，以后直接调出
@@ -319,8 +321,8 @@ def camera_service(request):
         dir_results = os.path.join(BASE_DIR_CAMERA_SERVICE_RESULTS, img_id)
 
         #分析 (只有baseDir,showcam,is_web_client,file_base_name参数有用，其他参数是给web client的)
-        my_dlp_helper.predict_all_multi_labels(file_img_source=file_original, str_uuid=img_id, baseDir=dir_results, lang=lang,
-                                               showcam=get_CAM, is_web_client=False)
+        my_module.my_dlp_helper_multi_labels.predict_all_multi_labels(file_img_source=file_original, str_uuid=img_id, baseDir=dir_results, lang=lang,
+                                                                      showcam=get_CAM, is_web_client=False)
 
         return HttpResponse('OK!')
     else:

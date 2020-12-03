@@ -11,6 +11,8 @@ import uuid
 import pickle
 import cv2
 
+import my_module.my_dlp_helper_multi_class
+import my_module.my_dlp_helper_multi_labels
 from my_module import my_dlp_helper
 
 # accept http parameters, call my_dlp_helper, save results to pkl, call view
@@ -19,15 +21,11 @@ def diagnose(request):
         return render(request, 'homepage.html')
 
     #region request parameters, receive the uploaded fundus image
-
     lang = str(request.session['lang'])
-
     ## 0:CAM, 1:Cam With Relu , 2: Grad-Cam++
     cam_type = request.POST.get('cam_type', '1')
-
     # show_deeplift = (request.POST.get('show_deeplift') == '1')
     show_deeplift = False
-
     show_deepshap = (request.POST.get('show_deepshap') == '1')
 
     if request.FILES.get('input_fundus_image') == None:
@@ -40,7 +38,6 @@ def diagnose(request):
         return render(request, file_view, {'err_msg': err_msg})
 
     webDir = os.path.dirname(os.path.abspath(__name__))
-
     str_uuid = str(uuid.uuid1())  # generate an unique ID
     request.session['image_uuid'] = str_uuid  #feedback will use
 
@@ -101,13 +98,13 @@ def diagnose(request):
 
     #region do predict
     if request.session.get('softmax_or_sigmoids', 'softmax') == 'softmax':
-        predict_result = my_dlp_helper.predict_all_multi_class(str_uuid, filename_save, webDir, lang,
-               cam_type= cam_type,
-               show_deeplift=show_deeplift, show_deepshap=show_deepshap)
+        predict_result = my_module.my_dlp_helper_multi_class.predict_all_multi_class(str_uuid, filename_save, webDir, lang,
+                                                                                     cam_type=cam_type,
+                                                                                     show_deeplift=show_deeplift, show_deepshap=show_deepshap)
     else:
-        predict_result = my_dlp_helper.predict_all_multi_labels(str_uuid, filename_save, webDir, lang,
-                cam_type=cam_type,
-                show_deeplift=show_deeplift, show_deepshap=show_deepshap)
+        predict_result = my_module.my_dlp_helper_multi_labels.predict_all_multi_labels(str_uuid, filename_save, webDir, lang,
+                                                                                       cam_type=cam_type,
+                                                                                       show_deeplift=show_deeplift, show_deepshap=show_deepshap)
 
     #endregion
 
